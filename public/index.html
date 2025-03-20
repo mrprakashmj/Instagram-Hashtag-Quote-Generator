@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Hashtag & Quote Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Instagram Hashtag & Quote Generator</h1>
+    <form id="postForm">
+      <label for="inputText">Enter your text:</label><br>
+      <textarea id="inputText" name="input_text" rows="4" placeholder="Type your text here..."></textarea><br>
+      <button type="submit">Generate</button>
+    </form>
+    <div id="loading">Generating content... Please wait.</div>
+    <div class="output" id="output">
+      <h2>Generated Quotes:</h2>
+      <p id="quotes"></p>
+      <h2>Generated Hashtags:</h2>
+      <p id="hashtags"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("postForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const loading = document.getElementById("loading");
+      const output = document.getElementById("output");
+      const quotesElement = document.getElementById("quotes");
+      const hashtagsElement = document.getElementById("hashtags");
+
+      // Show loading message and hide output
+      loading.style.display = "block";
+      output.classList.remove("show");
+      quotesElement.textContent = "";
+      hashtagsElement.textContent = "";
+
+      try {
+        const formData = new FormData(e.target);
+        const response = await fetch("/generate", {
+          method: "POST",
+          body: new URLSearchParams(formData),
+        });
+        const data = await response.json();
+        quotesElement.textContent = data.quotes.join("\n");
+        hashtagsElement.textContent = data.hashtags.join(" ");
+        output.classList.add("show");
+      } catch (error) {
+        console.error("Error:", error);
+        quotesElement.textContent = "An error occurred. Please try again.";
+      } finally {
+        // Hide loading message
+        loading.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
